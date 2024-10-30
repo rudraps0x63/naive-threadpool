@@ -1,48 +1,69 @@
 #pragma once
 
+#include <memory>
 #include <functional>
 #include <stdexcept>
 #include <type_traits>
 
+namespace Threadpool {
+
 template<typename R, typename... Ts>
 class Task {
+public:
+  using Ftype = std::function<R(Ts...)>;
+
 public:
   Task() = delete;
 
   template<class Callable>
-  Task(Callable&& callable) {
-    static_assert(
-      std::is_invocable<
+  Task(Callable&& callable)
+  {
+    constexpr bool is_invocable
+      = std::is_invocable<
         typename std::remove_reference<
           typename std::remove_pointer<Callable>::type
         >::type
-      >::value
-      ||
-      std::is_function<
+      >::value;
+
+    constexpr bool is_function
+      = std::is_function<
         typename std::remove_reference<
           typename std::remove_pointer<Callable>::type
         >::type
-      >::value,
-      "Passed callable cannot be invoked!"
-    );
+      >::value;
+
+    static_assert(is_invocable || is_function, "Passed callable neither invocable nor a function!");
 
     this->set_task(std::forward<Callable>(callable));
   }
 
   template<typename... Args>
-  R execute(Args&&... ts) {
-    if constexpr (!std::is_same<R, void>::value)
-      return func_(ts...);
+  R execute(Args&&... ts)
+  {
+    using FType = decltype(*func_.get());
 
-    func_(ts...);
+    Ftype f = *func_.get();
+
+    if constexpr (!std::is_same<R, void>::value)
+      return f(ts...);
+    else
+      f(ts...);
   }
 
 private:
   template<class Callable>
-  void set_task(Callable&& callable) {
+  void set_task(Callable& callable)
+  {
+    func_ = std::make_unique<Ftype>(callable);
+  }
+
+  template<class Callable>
+  void set_task(Callable&& callable)
+  {
     func_ = std::move(callable);
   }
 
-  std::function<R(Ts...)> func_;
+  std::shared_ptr<Ftype> func_;
 };
 
+} // namespace Threadpool
