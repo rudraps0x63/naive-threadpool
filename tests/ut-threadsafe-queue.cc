@@ -40,3 +40,4 @@ int main()
   TEST_ASSERT(test_queue_multithreaded);
 #endif
 }
+

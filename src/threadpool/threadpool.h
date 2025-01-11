@@ -41,6 +41,12 @@ public:
               });
             }
 
+            /**
+             * TODO:
+             * Thread marked stopped, but an element
+             * in the queue just arrived [?]
+             * Probably needs std::atomic
+             */
             if (self.status == ThreadStatus::ForceStopped)
               return;
 
@@ -69,7 +75,7 @@ public:
           }
           thread.thr.join();
         }
-        else { // Don't wait to join, detach the thread for OS cleanup
+        else { // Don't wait to join
           thread.thr.detach();
         }
       }

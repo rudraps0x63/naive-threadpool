@@ -16,3 +16,4 @@ foreach(TEST_FILE IN ITEMS ${TEST_SRCS})
   target_include_directories(${FILENAME} PRIVATE ${SRCS_DIR})
   target_link_libraries(${FILENAME} PRIVATE threadpool)
 endforeach(TEST_FILE)
+

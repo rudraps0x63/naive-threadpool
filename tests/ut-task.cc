@@ -89,3 +89,4 @@ int main()
   TEST_ASSERT(test_int_return_type);
   TEST_ASSERT(test_non_copy_constructible_type);
 }
+

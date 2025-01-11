@@ -19,3 +19,4 @@ if(BUILD_SHARED_LIBS)
 else()
   add_library(${LIB_NAME} STATIC ${LIB_SRCS})
 endif(BUILD_SHARED_LIBS)
+
